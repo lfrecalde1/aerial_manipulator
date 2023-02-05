@@ -65,7 +65,7 @@ class MobileRobot:
 
         return roll, pitch, yaw
 
-    def get_rotation_matrix(self):
+    def get_rotation_matrix(self)->np.ndarray:
         # get angles of the system
         roll, pitch, yaw = self.get_euler()
 
@@ -77,7 +77,21 @@ class MobileRobot:
         # Get Matrices
         rt = rz @ ry @ rx
         rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
-        
-        print(rt)
-        print("--------------------------------------")
-        print(rt_1.as_matrix())
+
+        return rt_1.as_matrix()
+
+
+    def get_quaternion(self)->np.ndarray:
+        # get angles of the system
+        roll, pitch, yaw = self.get_euler()
+
+        # Rotational Matrices
+        rx = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
+        ry = np.array([[np.cos(pitch), 0, np.sin(pitch)], [0, 1, 0], [-np.sin(pitch), 0, np.cos(pitch)]])
+        rz = np.array([[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+
+        # Get Matrices
+        rt = rz @ ry @ rx
+        rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
+
+        return rt_1.as_quat()
