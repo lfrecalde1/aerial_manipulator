@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.transform import Rotation
 class MobileRobot:
     def __init__(self, L : list, x: np.ndarray, ts: float):
         super().__init__()
@@ -8,6 +9,9 @@ class MobileRobot:
         self.ts = ts
         # Variables robot
         self.a = L[0]
+
+        # Angles Definition
+        self.rpy = np.array([0, 0, self.h[2]], dtype=np.double)
     def jacobian_system(self, x: np.ndarray) -> np.ndarray: 
         # Get internatl states
         qx = x[0]
@@ -50,14 +54,30 @@ class MobileRobot:
 
         # Update internal States
         self.h = x
-
+        self.rpy = np.array([0.0, 0.0, self.h[2]], dtype=np.double)
         return x.T
+
+    def get_euler(self)->tuple:
+        # Get angles of the system
+        roll = self.rpy[0]
+        pitch = self.rpy[1]
+        yaw = self.rpy[2]
+
+        return roll, pitch, yaw
+
+    def get_rotation_matrix(self):
+        # get angles of the system
+        roll, pitch, yaw = self.get_euler()
+
+        # Rotational Matrices
+        rx = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
+        ry = np.array([[np.cos(pitch), 0, np.sin(pitch)], [0, 1, 0], [-np.sin(pitch), 0, np.cos(pitch)]])
+        rz = np.array([[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+
+        # Get Matrices
+        rt = rz @ ry @ rx
+        rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
         
-
-
-
-
-
-
-
-
+        print(rt)
+        print("--------------------------------------")
+        print(rt_1.as_matrix())

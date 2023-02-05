@@ -2,14 +2,23 @@
 import rospy
 from std_msgs.msg import String
 import numpy as np
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Twist
 from aerial_manipulator.mobile_robot import MobileRobot
 
 # Simulation System
 def main():
     # Time definition
     ts = 0.05;
-    t_final = 5;
+    t_final = 60;
     t = np.arange(0, t_final + ts, ts, dtype=np.double)
+
+    # Frequency defintion
+    hz = int(1/ts)
+    rate = rospy.Rate(hz)
+
+    # Message Ros
+    rospy.loginfo_once("Aerial Manipulator Simulation")
 
     # Variables of the system
     a1 = 0.2
@@ -35,19 +44,36 @@ def main():
     # Control Vector
     u = np.zeros((2, t.shape[0]), dtype = np.double)
     u[0, :] = 0.1
-    u[1, :] = 0.0
+    u[1, :] = 0.1
 
     # Simulation of the system
     for k in range(0, t.shape[0]):
+        # Get time
+        tic = rospy.get_time()
 
+        # Get system angles
+        robot_1.get_rotation_matrix()
+       
         # Read Vaues Dynamics
         h[:, k+1] = robot_1.system(u[:, k])
-    print(h)
 
-
+        # Time restriction Correct
+        rate.sleep()
+        toc = rospy.get_time()
+        delta = toc - tic
 
 if __name__ == '__main__':
     try:
+        # Initialization Node
+        rospy.init_node("DJI_Matrice600_aerial_manipulator",disable_signals=True, anonymous=True)
+
+        # Publisher Info
+        odomety_topic = "DJI_Matrice600/odom"
+        odometry_message = Odometry
+        odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 100)
         main()
-    except rospy.ROSInterruptException:
+    except(rospy.ROSInterruptException, KeyboardInterrupt):
+        print("Error System")
         pass
+    else:
+        print("Complete Execution")
