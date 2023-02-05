@@ -23,3 +23,7 @@ Then install:
 chmod +x install_python.sh
 ./install_python.sh
 ```
+Due to the virtual env is neccesary to configure the catkin workspace as follows:
+```bash
+catkin_make -DPYTHON_EXECUTABLE=~/miniconda3/envs/py3-aerial_simulation/bin/python
+```
