@@ -5,12 +5,35 @@ import numpy as np
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from aerial_manipulator.mobile_robot import MobileRobot
+import scipy.io
+
+# Global variables Linear velocities
+vxd = 0.0
+vyd = 0.0
+vzd = 0.0
+# Global Variables angular velocities
+wxd = 0.0
+wyd = 0.0
+wzd = 0.0
+
+def velocity_call_back(velocity_message):
+    global vxd, vyd, vzd, wxd, wyd, wzd
+    # Read the linear Velocities
+    vxd = velocity_message.linear.x
+    vyd = velocity_message.linear.y
+    vzd = velocity_message.linear.z
+
+    # Read desired angular velocities from node
+    wxd = velocity_message.angular.x
+    wyd = velocity_message.angular.y
+    wzd = velocity_message.angular.z
+    return None
 
 # Simulation System
 def main(publiser_odom):
     # Time definition
     ts = 0.05;
-    t_final = 60;
+    t_final = 120;
     t = np.arange(0, t_final + ts, ts, dtype=np.double)
 
     # Frequency defintion
@@ -23,6 +46,9 @@ def main(publiser_odom):
     # Variables of the system
     a1 = 0.2
     L = [a1]
+
+    # Identification Parameters
+    chi = [0.3037, 0.2768, -0.0004018, 0.9835, 0.003818, 1.0725]
 
     # Initial Conditions
     x1 = 0.0
@@ -39,27 +65,32 @@ def main(publiser_odom):
     h[2, 0] = theta_1
 
     # Robot defintion
-    robot_1 = MobileRobot(L, h[:, 0], ts ,publiser_odom)
+    robot_1 = MobileRobot(L, h[:, 0], ts ,publiser_odom, chi)
 
     # Send Initial Values Communication
     robot_1.send_odometry()
 
     # Control Vector
     u = np.zeros((2, t.shape[0]), dtype = np.double)
-    u[0, :] = 0.1
-    u[1, :] = 0.1
+    u[0, 0] = vxd
+    u[1, 0] = wzd
+
 
     # Simulation of the system
     for k in range(0, t.shape[0]):
         # Get time
         tic = rospy.get_time()
 
-        # Get system angles
-        robot_1.get_rotation_matrix()
+        # Get velocities in the communication chanel
+        u[0, k] = vxd
+        u[1, k] = wzd
+
+
        
         # Read Vaues Dynamics
         h[:, k+1] = robot_1.system(u[:, k])
         robot_1.send_odometry()
+        rospy.loginfo("Aerial Manipulator Simulation")
 
         # Time restriction Correct
         rate.sleep()
@@ -73,8 +104,13 @@ if __name__ == '__main__':
         rospy.init_node("DJI_Matrice600_aerial_manipulator",disable_signals=True, anonymous=True)
 
         # Publisher Info
-        odomety_topic = "DJI_Matrice600/odom"
-        odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 100)
+        odomety_topic = "/DJI_Matrice600/odom"
+        odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 10)
+
+        # Subscribe Info
+        velocity_topic = "/DJI_Matrice600/cmd_vel"
+        velocity_subscriber = rospy.Subscriber(velocity_topic, Twist, velocity_call_back)
+
         main(odometry_publisher)
 
     except(rospy.ROSInterruptException, KeyboardInterrupt):
@@ -82,3 +118,4 @@ if __name__ == '__main__':
         pass
     else:
         print("Complete Execution")
+        pass

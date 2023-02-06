@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 from scipy.spatial.transform import Rotation
 
 class MobileRobot:
-    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher):
+    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher, parameters: list):
         super().__init__()
         # States desired point
         self.h = x
@@ -15,6 +15,8 @@ class MobileRobot:
         self.ts = ts
         # Variables robot
         self.a = L[0]
+        # Identification Parameters
+        self.chi = parameters
 
         # Angles Definition
         self.rpy = np.array([0, 0, self.h[2]], dtype=np.double)
@@ -42,6 +44,9 @@ class MobileRobot:
         # Build Matrix
         J = np.array([[J_11, J_12],[J_21, J_22],[J_31, J_32]], dtype = np.double)
         return J
+        
+    def get_M_matrix(self, x:np.ndarray)-> np.ndarray:
+        pass
 
     def f_model(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
         # Jacobian Matrix
