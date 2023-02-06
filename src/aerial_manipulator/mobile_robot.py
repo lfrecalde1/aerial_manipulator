@@ -1,7 +1,13 @@
 import numpy as np
+import rospy
+from std_msgs.msg import String
+import numpy as np
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Twist
 from scipy.spatial.transform import Rotation
+
 class MobileRobot:
-    def __init__(self, L : list, x: np.ndarray, ts: float):
+    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher):
         super().__init__()
         # States desired point
         self.h = x
@@ -12,6 +18,13 @@ class MobileRobot:
 
         # Angles Definition
         self.rpy = np.array([0, 0, self.h[2]], dtype=np.double)
+
+        # Complete states Position and angles System
+        self.H = np.array([self.h[0], self.h[1], 0, self.rpy[0], self.rpy[1], self.h[2]], dtype=np.double)
+
+        # Comunication Odometry
+        self.odom_publisher = odom_publi
+
     def jacobian_system(self, x: np.ndarray) -> np.ndarray: 
         # Get internatl states
         qx = x[0]
@@ -55,6 +68,8 @@ class MobileRobot:
         # Update internal States
         self.h = x
         self.rpy = np.array([0.0, 0.0, self.h[2]], dtype=np.double)
+        self.H = np.array([self.h[0], self.h[1], 0, self.rpy[0], self.rpy[1], self.h[2]], dtype=np.double)
+
         return x.T
 
     def get_euler(self)->tuple:
@@ -95,3 +110,24 @@ class MobileRobot:
         rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
 
         return rt_1.as_quat()
+
+    def get_internal_states(self)->np.ndarray:
+        # Get the internal states of the system
+        x = self.H
+        return x
+
+    def send_odometry(self)->None:
+        x = self.get_internal_states()
+        quat = self.get_quaternion()
+        odom_message = Odometry()
+        odom_message.pose.pose.position.x = x[0]
+        odom_message.pose.pose.position.y = x[1]
+        odom_message.pose.pose.position.z = x[2]
+
+        odom_message.pose.pose.orientation.x = quat[0]
+        odom_message.pose.pose.orientation.y = quat[1]
+        odom_message.pose.pose.orientation.z = quat[2]
+        odom_message.pose.pose.orientation.w = quat[3]
+
+        self.odom_publisher.publish(odom_message)
+        return None

@@ -7,7 +7,7 @@ from geometry_msgs.msg import Twist
 from aerial_manipulator.mobile_robot import MobileRobot
 
 # Simulation System
-def main():
+def main(publiser_odom):
     # Time definition
     ts = 0.05;
     t_final = 60;
@@ -39,7 +39,10 @@ def main():
     h[2, 0] = theta_1
 
     # Robot defintion
-    robot_1 = MobileRobot(L, h[:, 0], ts)
+    robot_1 = MobileRobot(L, h[:, 0], ts ,publiser_odom)
+
+    # Send Initial Values Communication
+    robot_1.send_odometry()
 
     # Control Vector
     u = np.zeros((2, t.shape[0]), dtype = np.double)
@@ -56,11 +59,13 @@ def main():
        
         # Read Vaues Dynamics
         h[:, k+1] = robot_1.system(u[:, k])
+        robot_1.send_odometry()
 
         # Time restriction Correct
         rate.sleep()
         toc = rospy.get_time()
         delta = toc - tic
+    return None
 
 if __name__ == '__main__':
     try:
@@ -69,9 +74,9 @@ if __name__ == '__main__':
 
         # Publisher Info
         odomety_topic = "DJI_Matrice600/odom"
-        odometry_message = Odometry
         odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 100)
-        main()
+        main(odometry_publisher)
+
     except(rospy.ROSInterruptException, KeyboardInterrupt):
         print("Error System")
         pass

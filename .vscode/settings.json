@@ -1,0 +1,12 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/fer/ros_aerial_manipulator/devel_isolated/system_dynamics/lib/python3/dist-packages",
+        "/home/fer/ros_aerial_manipulator/devel_isolated/aerial_manipulator/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/fer/ros_aerial_manipulator/devel_isolated/system_dynamics/lib/python3/dist-packages",
+        "/home/fer/ros_aerial_manipulator/devel_isolated/aerial_manipulator/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
+}
