@@ -334,3 +334,5 @@ ax_7.YMinorGrid = 'on';
 ax_7.MinorGridAlpha = 0.15;
 ax_7.LineWidth = 0.8;
 ax_7.XLim = [0 t(end)];
+
+print -dpng doc\Experimental_values
