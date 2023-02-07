@@ -2,4 +2,4 @@
 
 Experimental values
  
-[<img src="doc/Experimental_values.png" width="435" height="320">](doc/Experimental_values.png)
+[<img src="doc/Experimental_values.png" width="800" height="500">](doc/Experimental_values.png)
