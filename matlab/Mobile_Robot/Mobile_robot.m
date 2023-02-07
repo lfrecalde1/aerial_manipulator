@@ -12,15 +12,15 @@ t = (to:ts:tf);
 %% ROS PARAMETER FOR COMUNICATION
 rosshutdown
 active = true;
-Master = 'http://192.168.0.104:11311';
-Local = '192.168.0.104';
+Master = 'http://190.124.230.190:11311';
+Local = '190.124.230.190';
 ROS_Options(Master,Local,active);
 %rosinit('192.168.0.104', 'NodeHost', '192.168.0.105', 'Nodename', '/Matlab_Communication');
 
 %% OBJECTS CREATION OF TOPICS ROS
-robot = rospublisher('/DJI_Matrice600/cmd_vel');
+robot = rospublisher('/mobile/cmd_vel');
 velmsg = rosmessage(robot);
-odom = rossubscriber('/DJI_Matrice600/odom');
+odom = rossubscriber('/mobile/odom');
 
 %% SET VALUES TO ZERO
 send_velocities(robot, velmsg, [0, 0, 0, 0, 0 , 0])

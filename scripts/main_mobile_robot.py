@@ -41,7 +41,7 @@ def main(publiser_odom):
     rate = rospy.Rate(hz)
 
     # Message Ros
-    rospy.loginfo_once("Aerial Manipulator Simulation")
+    rospy.loginfo_once("Mobile Robot Simulation")
 
     # Variables of the system
     a1 = 0.2
@@ -54,15 +54,19 @@ def main(publiser_odom):
     x1 = 0.0
     y1 = 0.0
     theta_1 = 0*(np.pi/180)
+    u = 0.0
+    w = 0.0
 
     x1 = x1 + a1*np.cos(theta_1)
     y1 = y1 + a1*np.sin(theta_1)
     
     # Vector of states
-    h = np.zeros((3, t.shape[0] + 1), dtype=np.double)
+    h = np.zeros((5, t.shape[0] + 1), dtype=np.double)
     h[0, 0] = x1
     h[1, 0] = y1
     h[2, 0] = theta_1
+    h[3, 0] = u
+    h[4, 0] = w
 
     # Robot defintion
     robot_1 = MobileRobot(L, h[:, 0], ts ,publiser_odom, chi)
@@ -71,9 +75,9 @@ def main(publiser_odom):
     robot_1.send_odometry()
 
     # Control Vector
-    u = np.zeros((2, t.shape[0]), dtype = np.double)
-    u[0, 0] = vxd
-    u[1, 0] = wzd
+    uc = np.zeros((2, t.shape[0]), dtype = np.double)
+    uc[0, 0] = vxd
+    uc[1, 0] = wzd
 
 
     # Simulation of the system
@@ -82,15 +86,15 @@ def main(publiser_odom):
         tic = rospy.get_time()
 
         # Get velocities in the communication chanel
-        u[0, k] = vxd
-        u[1, k] = wzd
+        uc[0, k] = vxd
+        uc[1, k] = wzd
 
 
        
         # Read Vaues Dynamics
-        h[:, k+1] = robot_1.system(u[:, k])
+        h[:, k+1] = robot_1.system(uc[:, k])
         robot_1.send_odometry()
-        rospy.loginfo("Aerial Manipulator Simulation")
+        rospy.loginfo("Mobile Robot Simulation")
 
         # Time restriction Correct
         rate.sleep()
@@ -101,14 +105,14 @@ def main(publiser_odom):
 if __name__ == '__main__':
     try:
         # Initialization Node
-        rospy.init_node("DJI_Matrice600_aerial_manipulator",disable_signals=True, anonymous=True)
+        rospy.init_node("mobile_robot_simulation",disable_signals=True, anonymous=True)
 
         # Publisher Info
-        odomety_topic = "/DJI_Matrice600/odom"
+        odomety_topic = "/mobile/odom"
         odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 10)
 
         # Subscribe Info
-        velocity_topic = "/DJI_Matrice600/cmd_vel"
+        velocity_topic = "/mobile/cmd_vel"
         velocity_subscriber = rospy.Subscriber(velocity_topic, Twist, velocity_call_back)
 
         main(odometry_publisher)
