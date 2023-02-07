@@ -125,6 +125,33 @@ classdef mobile_robot_dynamic < matlab.mixin.SetGet
             
         end
         
+        function M = get_M_matrix_control(obj, x, xp)
+            
+            % get states of the system
+            q_x = x(1);
+            q_y = x(2);
+            theta = x(3);
+            q_u = xp(1);
+            q_w = xp(2);
+            
+            % Dynamic parameters
+            chi_1 = obj.chi(1);
+            chi_2 = obj.chi(2);
+            chi_3 = obj.chi(3);
+            chi_4 = obj.chi(4);
+            chi_5 = obj.chi(5);
+            chi_6 = obj.chi(6);
+            
+            M11 = chi_1;
+            M12 = 0;
+            M21 = 0;
+            M22 = chi_2;
+            
+            M = [M11, M12;...
+                M21, M22];
+            
+        end
+        
         function C = get_C_matrix(obj)
             
             % get states of the system
@@ -149,7 +176,30 @@ classdef mobile_robot_dynamic < matlab.mixin.SetGet
                  C2];
             
         end
-        
+        function C = get_C_matrix_control(obj, x, xp)
+            
+            % get states of the system
+            q_x = x(1);
+            q_y = x(2);
+            theta = x(3);
+            q_u = xp(1);
+            q_w = xp(2);
+            
+            % Dynamic parameters
+            chi_1 = obj.chi(1);
+            chi_2 = obj.chi(2);
+            chi_3 = obj.chi(3);
+            chi_4 = obj.chi(4);
+            chi_5 = obj.chi(5);
+            chi_6 = obj.chi(6);
+            
+            C1 = -chi_3*q_w^2 + chi_4*q_u;
+            C2 = chi_5*q_u*q_w + chi_6*q_w;
+            
+            C = [C1;...
+                C2];
+            
+        end
         function xp = f_model(obj, x, u)
             %Gets funtion dot of the system
             

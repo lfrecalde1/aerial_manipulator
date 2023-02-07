@@ -5,7 +5,7 @@ clc,clear all,close all;
 
 %% DEFINITION OF TIME VARIABLES
 ts = 0.05;
-tf = 10;
+tf = 30;
 to = 0;
 t = (to:ts:tf);
 
@@ -61,9 +61,18 @@ for k=1:1:length(t)
     qe(:, k) = qd(:,k)-q(1:2,k);
     
     u(:, k) = controller.kinematic_controller(qd(:, k), qdp(:, k), q(:, k));
+    
+    % Derivative Desired
+    if k > 1
+        up(: ,k) = (u(:, k) - u(:, k-1))/ts;
+    else
+        up(:, k) = [0; 0];
+    end
+    
+    u_ref(:, k ) = controller.Dynamic_controller(u(:, k), up(:, k), q(:, k), qp(:, k));
    
     %% SEND VALUES OF CONTROL ROBOT
-    send_velocities(robot, velmsg, [u(1, k), 0, 0, 0, 0 , u(2, k)]);
+    send_velocities(robot, velmsg, [u_ref(1, k), 0, 0, 0, 0 , u_ref(2, k)]);
     
     %% GET VALUES OF MOBILE
     [q(:, k+1), qp(:, k+1)] = odometry(odom, L1);
@@ -78,4 +87,4 @@ largo = 0.4;
 ancho = 0.3;
 SIMULACION(a,largo,ancho,q(1,:),q(2,:),qd(1, :),qd(2, :),q(3, :),ts);
 % Save Data
-save("Mobile_Kinematics_Ros.mat", "t", "q", "u", "qd", "qe", "ts");
+save("Mobile_Kinematics_Ros.mat", "t", "q", "u", "qd", "qe", "ts", "qp");

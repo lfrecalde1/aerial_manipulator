@@ -29,8 +29,9 @@ classdef controller_robot < matlab.mixin.SetGet
            xe = xd - x_aux;
         end
         
-        function ve = get_velocity_error(obj, vd, xp)
-            v = xp;
+        function ve = get_velocity_error(obj, vd)
+            x = obj.Robot.get_states();
+            v = x(4:5);
             ve = vd - v;
             
         end
@@ -48,7 +49,7 @@ classdef controller_robot < matlab.mixin.SetGet
             % Get Jacobian Matrix
             M =  obj.Robot.get_M_matrix_control(x, xp);
             C = obj.Robot.get_C_matrix_control(x, xp);
-            v = obj.get_operator_velocity(vd, vdp, xp);
+            v = obj.get_operator_velocity(vd, vdp);
             u = M*v + C;
         end
         
@@ -60,10 +61,10 @@ classdef controller_robot < matlab.mixin.SetGet
            v =  (xdp + obj.K2*tanh(inv(obj.K2)*obj.K1*xe));
         end
         
-         function v = get_operator_velocity(obj, vd, vdp, xp)
+         function v = get_operator_velocity(obj, vd, vdp, )
            
            % Auxiliar signal
-           ve = obj.get_velocity_error(vd, xp);
+           ve = obj.get_velocity_error(vd);
            v =  (vdp + obj.K2*tanh(inv(obj.K2)*obj.K1*ve));
         end
         
