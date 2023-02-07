@@ -1,5 +1,5 @@
 <launch>
-    <node pkg = "aerial_manipulator" name = "Node_Dynamics" type = "main.py" output = "screen">
+    <node pkg = "aerial_manipulator" name = "Node_Dynamics" type = "main_mobile_robot.py" output = "screen">
     </node>
 
 </launch>

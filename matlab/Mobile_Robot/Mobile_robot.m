@@ -52,7 +52,7 @@ K2 = 1*eye(2);
 
 %% CONTROL SECTION
 chi = [0.3037;0.2768;-0.0004018;0.9835;0.003818;1.0725];
-mobile_1 = mobile_robot(L1, chi, q(:,1), ts);
+mobile_1 = mobile_robot_dynamic(L1, chi, q(:,1), ts);
 controller = controller_robot(K1, K2, mobile_1);
 
 for k=1:1:length(t)
@@ -61,6 +61,7 @@ for k=1:1:length(t)
     qe(:, k) = qd(:,k)-q(1:2,k);
     
     u(:, k) = controller.kinematic_controller(qd(:, k), qdp(:, k), q(:, k));
+   
     %% SEND VALUES OF CONTROL ROBOT
     send_velocities(robot, velmsg, [u(1, k), 0, 0, 0, 0 , u(2, k)]);
     
