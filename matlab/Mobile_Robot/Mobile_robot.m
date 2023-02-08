@@ -12,8 +12,8 @@ t = (to:ts:tf);
 %% ROS PARAMETER FOR COMUNICATION
 rosshutdown
 active = true;
-Master = 'http://190.124.230.190:11311';
-Local = '190.124.230.190';
+Master = 'http://190.124.230.188:11311';
+Local = '190.124.230.188';
 ROS_Options(Master,Local,active);
 %rosinit('192.168.0.104', 'NodeHost', '192.168.0.105', 'Nodename', '/Matlab_Communication');
 
