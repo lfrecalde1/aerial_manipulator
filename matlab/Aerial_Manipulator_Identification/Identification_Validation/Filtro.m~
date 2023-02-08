@@ -1,0 +1,22 @@
+function x_filtrada = Filtro(x, t)
+%UNTITLED5 Summary of this function goes here
+%   Detailed explanation goes 
+
+for k = 1:length(t)
+    
+    if k > 1
+        variacion=abs(x(k)-x_);
+        if variacion>3
+            x_filtrada(k)=x_1;
+            
+        else
+            x_filtrada(k)=x(k);
+        end
+        
+    else
+        
+    end
+end
+
+
+end
