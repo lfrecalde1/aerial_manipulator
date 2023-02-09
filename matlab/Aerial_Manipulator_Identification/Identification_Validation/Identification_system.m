@@ -102,7 +102,7 @@ q3pp =  [0 , diff(q3p)/ts];
 qpp = [q1pp; q2pp; q3pp];
 
 %% FILTER SIGNALS
-landa = 5;
+landa = 3;
 F1=tf(landa,[1 landa]);
 
 ul_f = lsim(F1,ul,t)';
@@ -437,20 +437,20 @@ ax_7.XLim = [0 t(end)];
 
 
 %% OPTIMIZATION PARAMETERS IDENTIFICATION
-options = optimset('Display','iter',...
-                'TolFun', 1e-8,...
-                'MaxIter', 10000,...
-                'Algorithm', 'active-set',...
-                'FinDiffType', 'forward',...
-                'RelLineSrchBnd', [],...
-                'RelLineSrchBndDuration', 1,...
-                'TolConSQP', 1e-6); 
-            
+options = optimoptions(@fmincon,'Algorithm','interior-point'); 
+options.MaxFunctionEvaluations = 50000;   
+rng default;
+ms = MultiStart('FunctionTolerance',2e-4,'UseParallel',true);
+gs = GlobalSearch(ms);
+
 %% INITIAL VALUES
 values= load("Xini.mat"); 
 chi = values.x;
 f_obj1 = @(x)  cost_func_dynamic(x, vref_f, vp_f, v_f, qp_ref_f, qpp_f, qp_f, q_f, N);
-x = fmincon(f_obj1,chi,[],[],[],[],[],[],[],options);
+% problem = fmincon(f_obj1,chi,[],[],[],[],[],[],[],options);
+problem = createOptimProblem('fmincon','objective',...
+    f_obj1,'x0',chi,'lb',[],'ub',[],'options',options);
+[x, f] = run(gs, problem)
 values_final = x;
 
 %% SIMULATION SYSTEM
@@ -705,3 +705,7 @@ ax_7.YMinorGrid = 'on';
 ax_7.MinorGridAlpha = 0.15;
 ax_7.LineWidth = 0.8;
 ax_7.XLim = [0 t(end)];
+print -dpng doc\Identification_system
+
+%% SAVE PARAMETERS
+save("Identification_values.mat", "x")
