@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
 import rospy
 from std_msgs.msg import String
 import numpy as np
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 import scipy.io
+from mat4py import loadmat
+
 
 # Global variables Linear velocities
 vxd = 0.0
@@ -29,17 +32,9 @@ def velocity_call_back(velocity_message):
 
 # Simulation System
 def main(publiser_odom):
-    # Time definition
-    ts = 0.05;
-    t_final = 120;
-    t = np.arange(0, t_final + ts, ts, dtype=np.double)
 
-    # Frequency defintion
-    hz = int(1/ts)
-    rate = rospy.Rate(hz)
-
-    # Message Ros
-    rospy.loginfo_once("Aerial Manipulator Simulation")
+    # Load Information
+    data = loadmat('datafile.mat')
 
 
 if __name__ == '__main__':

@@ -7,3 +7,4 @@ pip install -U rospkg
 pip install empy
 pip install PyQt5
 pip install PySide2
+pip install mat4py
