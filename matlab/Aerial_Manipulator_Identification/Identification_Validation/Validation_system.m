@@ -3,13 +3,14 @@
 clc, clear all, close all;
 
 %% LOAD DATA 
-load('Ident_real_1_3.mat');
+load('Ident_real_1_1.mat');
 load("Identification_values.mat");
 chi = x;
 %% TIME
 t;
 dt_time = dt;
 ts;
+ts = 0.1;
 N = length(t);
 
 %% POSE OF THE SYSTEM THESE VALUES WERE OBTAINED RESPECT TO THE INERTIAL FRAME
@@ -80,7 +81,7 @@ v;
 vref = [ul_ref;...
         um_ref;...
         un_ref;...
-        w_ref];
+        w_ref]*0;
     
 %% ACCELERATION OF THE SYSTEM
 ulp = [0 , diff(ul)/ts];
@@ -94,7 +95,7 @@ vp = [ulp; ump; unp; wp];
 qp;
 
 %% REFERENCE OF THE SYSTEM
-qp_ref = [q1p_ref; q2p_ref; q3p_ref];
+qp_ref = [q1p_ref; q2p_ref; q3p_ref]*0;
 
 q1pp =  [0 , diff(q1p)/ts];
 q2pp =  [0 , diff(q2p)/ts];

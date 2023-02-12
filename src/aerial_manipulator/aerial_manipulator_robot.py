@@ -8,10 +8,10 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
 class AerialManipulatorRobot:
-    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher, parameters: list, joint_publi: rospy.topics.Publisher):
+    def __init__(self, L : list, v: np.ndarray, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher, parameters: list, joint_publi: rospy.topics.Publisher):
         super().__init__()
         # States desired point
-        self.h = x
+        self.h = v
         # Sample time
         self.ts = ts
 
@@ -25,18 +25,57 @@ class AerialManipulatorRobot:
         self.values.insert(0, 0)
         
         # Define Pose of the Aerial vehicle position and orientation
-
-        # Define Velocity of the Aerial Vehicle linear and angular
+        self.x = np.array([x[0], x[1], x[2], 0.0, 0.0, x[3]], dtype=np.double)
+        self.rpy = np.array([0.0, 0.0, x[3]], dtype=np.double) 
+        self.xp = np.array([v[0], v[1], v[2], 0.0, 0.0, v[3]], dtype=np.double)  
 
         # Define angular position of the joints
-
-        # Define angular velocity of the joints
+        self.q = np.array([v[7], v[8], v[9]], dtype=np.double) 
+        self.qp = np.array([v[4], v[5], v[6]], dtype=np.double) 
 
         # Comunication Odometry
         self.odom_publisher = odom_publi
         self.joint_publisher = joint_publi
+        
+    def get_J_matrix(self, x: np.ndarray)->np.ndarray:
+        # System variables
+        l_2 = self.L2
+        l_3 = self.L3
+        g = self.G
 
-    def get_M_matrix(self, x:np.ndarray)-> np.ndarray:
+        # Internal states of the system
+        x1 = x[0];
+        y1 = x[1];
+        z1 = x[2];
+        th = x[3];
+
+        # Values J matrix
+        J11 = np.cos(th)
+        J12 = -np.sin(th)
+        J13 = 0.0
+        J14 = 0.0
+
+        J21 = np.sin(th)
+        J22 = np.cos(th)
+        J23 = 0.0
+        J24 = 0.0
+
+        J31 = 0.0
+        J32 = 0.0
+        J33 = 1.0
+        J34 = 0.0
+
+        J41 = 0.0
+        J42 = 0.0
+        J43 = 0.0
+        J44 = 1.0
+
+        # Jacobian Matrix
+        J = np.array([[J11, J12, J13, J14], [J21, J22, J23, J24], [J31, J32, J33, J34], [J41, J42, J43, J44]], dtype=np.double)
+
+        return J
+
+    def get_M_matrix(self, x: np.ndarray)-> np.ndarray:
         # Variables system
         l_2 = self.L2
         l_3 = self.L3
@@ -296,7 +335,7 @@ class AerialManipulatorRobot:
 
         return G
 
-    def f_model(self, x: np.array, u: np.array)->np.array:
+    def f_model(self, x: np.ndarray, u: np.ndarray)->np.ndarray:
         # Get system parameters
         l_2 = self.L2
         l_3 = self.L3
@@ -348,57 +387,150 @@ class AerialManipulatorRobot:
 
         return xp
 
-
-        
-
+    def f_model_drone(self, x: np.ndarray, u: np.ndarray)->np.ndarray:
+        # Get Jacobian Matrix
+        J = self.get_J_matrix(x)
+        # Drone Evolution
+        xp = J@u
+        return xp
 
     def system(self, u: np.ndarray)->np.ndarray:
         # Get sample time
         Ts = self.ts
 
         # Get states of the system
-        x = self.h
+        v = self.h
 
         # Runge Kuta 4
-        k1 = self.f_model(x, u)
-        k2 = self.f_model(x + (Ts/2)*k1, u)
-        k3 = self.f_model(x + (Ts/2)*k2, u)
-        k4 = self.f_model(x + Ts*k3, u)
-        x = x + (Ts/6)*(k1 + 2*k2 + 2*k3 + k4)
+        k1 = self.f_model(v, u)
+        k2 = self.f_model(v + (Ts/2)*k1, u)
+        k3 = self.f_model(v + (Ts/2)*k2, u)
+        k4 = self.f_model(v + Ts*k3, u)
+        v = v + (Ts/6)*(k1 + 2*k2 + 2*k3 + k4)
 
         # Update internal States
-        self.h = x
-        return x.T
+        self.h = v
+        self.q = np.array([v[7], v[8], v[9]], dtype=np.double) 
+        self.qp = np.array([v[4], v[5], v[6]], dtype=np.double) 
+
+
+        return v.T
+
+    def system_drone(self)->np.ndarray:
+        # Get sample time
+        Ts = self.ts
+
+        # Velocities system
+        v = self.h
+
+        # System Internal states
+        x_k = self.x[0:4]
+        # Runge Kuta 4
+
+        k1 = self.f_model_drone(x_k, v[0:4])
+        k2 = self.f_model_drone(x_k + (Ts/2)*k1, v[0:4])
+        k3 = self.f_model_drone(x_k + (Ts/2)*k2, v[0:4])
+        k4 = self.f_model_drone(x_k + Ts*k3, v[0:4])
+        x_k = x_k + (Ts/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+
+        self.x = np.array([x_k[0], x_k[1], x_k[2], 0.0, 0.0, x_k[3]], dtype=np.double)
+        self.rpy = np.array([0.0, 0.0, x_k[3]], dtype=np.double) 
+        self.xp = np.array([v[0], v[1], v[2], 0.0, 0.0, v[3]], dtype=np.double)  
+        return x_k.T
 
     def send_odometry(self)->None:
         # Get states System 
-        xp = self.h
+        xp = self.xp
+        x = self.x
+        quat = self.get_quaternion()
 
         # Create type pf message
         odom_message = Odometry()
+
+        # Pose system
+        odom_message.pose.pose.position.x = x[0]
+        odom_message.pose.pose.position.y = x[1]
+        odom_message.pose.pose.position.z = x[2]
+        odom_message.pose.pose.orientation.x = quat[0]
+        odom_message.pose.pose.orientation.y = quat[1]
+        odom_message.pose.pose.orientation.z = quat[2]
+        odom_message.pose.pose.orientation.z = quat[3]
 
         # Velocity of the system
         odom_message.twist.twist.linear.x = xp[0]
         odom_message.twist.twist.linear.y = xp[1]
         odom_message.twist.twist.linear.z = xp[2]
-        odom_message.twist.twist.angular.x = 0.0
-        odom_message.twist.twist.angular.y = 0.0
-        odom_message.twist.twist.angular.z = xp[3]
+        odom_message.twist.twist.angular.x = xp[3]
+        odom_message.twist.twist.angular.y = xp[4]
+        odom_message.twist.twist.angular.z = xp[5]
 
         self.odom_publisher.publish(odom_message)
         return None
 
     def send_joint(self)->None:
         # Get states System 
-        xp = self.h
+        x = self.q
+        xp = self.qp
         # Message defintion
         joint_message = JointState()
         joint_message.header = Header()
         joint_message.header.stamp = rospy.Time.now()
         joint_message.name = ['q0', 'q1', 'q2']
-        joint_message.position = [xp[7], xp[8], xp[9]]
-        joint_message.velocity = [xp[4], xp[5], xp[6]]
+        joint_message.position = [x[0], x[1], x[2]]
+        joint_message.velocity = [xp[0], xp[1], xp[2]]
         joint_message.effort = []
 
         self.joint_publisher.publish(joint_message)
         return None
+
+    def get_euler(self)->tuple:
+        # Get angles of the system
+        roll = self.rpy[0]
+        pitch = self.rpy[1]
+        yaw = self.rpy[2]
+
+        return roll, pitch, yaw
+
+    def get_rotation_matrix(self)->np.ndarray:
+        # get angles of the system
+        roll, pitch, yaw = self.get_euler()
+
+        # Rotational Matrices
+        rx = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
+        ry = np.array([[np.cos(pitch), 0, np.sin(pitch)], [0, 1, 0], [-np.sin(pitch), 0, np.cos(pitch)]])
+        rz = np.array([[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+
+        # Get Matrices
+        rt = rz @ ry @ rx
+        rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
+
+        return rt_1.as_matrix()
+
+
+    def get_quaternion(self)->np.ndarray:
+        # get angles of the system
+        roll, pitch, yaw = self.get_euler()
+
+        # Rotational Matrices
+        rx = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
+        ry = np.array([[np.cos(pitch), 0, np.sin(pitch)], [0, 1, 0], [-np.sin(pitch), 0, np.cos(pitch)]])
+        rz = np.array([[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+
+        # Get Matrices
+        rt = rz @ ry @ rx
+        rt_1 = Rotation.from_euler('xyz', [roll, pitch, yaw], degrees = False)
+
+        return rt_1.as_quat()
+
+    def get_internal_states_drone(self)->np.ndarray:
+        # Get the internal states of the system
+        x = self.x
+        xp = self.xp
+        return x, xp
+
+    def get_internal_states_joint(self)->np.ndarray:
+        # Get the internal states of the system
+        x = self.q
+        xp = self.qp
+        return x, xp

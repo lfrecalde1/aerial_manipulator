@@ -65,9 +65,22 @@ def main(publiser_odom, publisher_joint):
     L = [l_2, l_3, g]
 
     # Identification Parameters
-    chi = [0.661572614024077, 0.169060601256173, 0.176106759253213, 0.00358336008248739, 0.00108259116812643, -0.00154112503045292, -0.000659822298657971, 33.6014054511568, 0.0742360120879960, 0.569427370141837, -0.264497052266231, 0.00309032010217130, 0.00672411315944624, -0.0206057382683352, 0.263024143591578, 0.0708653674792052, 2.56685427762986e-06, 11.8201949483608, -0.00179197350749983, 0.00312730734389077, 0.0296521572583440, 0.0109883478548300, 7.66001609460077e-05, 13.4468257356268, 0.0124545527379815, 0.491664311420148, 168.840550370009, -0.488896323007813, -0.853943687423747, -0.0745666702825102, -0.0656607511477870, -0.778288579347444]
+    chi = [0.767360879658187, 0.100392049558377, 0.154759038673317, 38.6081368718373, -0.251845093279128, 0.251162312249968, 0.000776423855577558, 0.00385727722890279, 0.0677648559474654, 0.600581359378254, -0.263735834925159, 28.6385256949156, 0.00991883372922247, -0.0164389624249138, 0.277904939603094, 0.0765941547426626, 0.0196359064621946, 0.0558688201369773, -0.400294847258480, 0.666204613050887, 0.0274410701828662, 3.10969308784518, -0.0645680025113339, 0.0649604268297644, 2.74795798072509, 0.496027789996623, 0.0177256588261969, -0.491939820125297, -0.866962882867046, -15.8401945765054, -13.3427202909208, -0.802106747335276]
 
-    # Initial Conditions
+    # Initial Conditions Odometry
+    x1 = 0.0
+    y1 = 0.0
+    z1 = 2
+    theta_1 = 0*(np.pi/180)
+
+    # Initial conditions odometry vector
+    x = np.zeros((4, t.shape[0] + 1), dtype=np.double)
+    x[0, 0] = x1
+    x[1, 0] = y1
+    x[2, 0] = z1
+    x[3, 0] = theta_1
+
+    # Initial conditions system velocities
     ul = 0.0
     um = 0.0
     un = 0.0
@@ -79,7 +92,7 @@ def main(publiser_odom, publisher_joint):
     q2 = 0.0
     q3 = 0.0
 
-    # Vector of states of the system
+    # Initial conditions velocities vector
     h = np.zeros((10, t.shape[0] + 1), dtype=np.double)
     h[0, 0] = ul
     h[1, 0] = um
@@ -93,7 +106,7 @@ def main(publiser_odom, publisher_joint):
     h[9, 0] = q3
 
     # Definition Aerial Vehicle
-    aerial_1 = AerialManipulatorRobot(L, h[:, 0], ts, publiser_odom, chi, publisher_joint)
+    aerial_1 = AerialManipulatorRobot(L, h[:, 0], x[:, 0], ts, publiser_odom, chi, publisher_joint)
 
 
     # Control Variables
@@ -120,8 +133,9 @@ def main(publiser_odom, publisher_joint):
         uc[5, k] = q2pd
         uc[6, k] = q3pd
 
-        # System 
+        # System Evolution
         h[:, k+1] = aerial_1.system(uc[:, k])
+        x[:, k+1] = aerial_1.system_drone()
         aerial_1.send_odometry()
         aerial_1.send_joint()
         rospy.loginfo("Aerial Manipulator Simulation")

@@ -9,6 +9,7 @@ load('Ident_real_1_1.mat');
 t;
 dt_time = dt;
 ts;
+ts = 0.1;
 N = length(t);
 
 %% POSE OF THE SYSTEM THESE VALUES WERE OBTAINED RESPECT TO THE INERTIAL FRAME
