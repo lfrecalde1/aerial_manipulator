@@ -47,8 +47,8 @@ def joints_call_back(joints_message):
 def main(publiser_odom, publisher_joint):
 
     # Time definition
-    ts = 0.1;
-    t_final = 50;
+    ts = 0.05;
+    t_final = 300;
     t = np.arange(0, t_final + ts, ts, dtype=np.double)
 
     # Frequency defintion
