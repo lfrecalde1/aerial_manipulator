@@ -4,10 +4,9 @@ from std_msgs.msg import String
 import numpy as np
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
-import scipy.io
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64MultiArray
 from aerial_manipulator.aerial_manipulator_robot import AerialManipulatorRobot
-
-
 
 # Global variables Linear velocities
 vxd = 0.0
@@ -36,8 +35,16 @@ def velocity_call_back(velocity_message):
     wzd = velocity_message.angular.z
     return None
 
+def joints_call_back(joints_message):
+    global q1pd, q2pd, q3pd
+    joints_references = joints_message.data
+    q1pd = joints_references[0]
+    q2pd = joints_references[1]
+    q3pd = joints_references[2]
+    return None
+
 # Simulation System
-def main(publiser_odom):
+def main(publiser_odom, publisher_joint):
 
     # Time definition
     ts = 0.1;
@@ -86,7 +93,8 @@ def main(publiser_odom):
     h[9, 0] = q3
 
     # Definition Aerial Vehicle
-    aerial_1 = AerialManipulatorRobot(L, h[:, 0], ts, publiser_odom, chi)
+    aerial_1 = AerialManipulatorRobot(L, h[:, 0], ts, publiser_odom, chi, publisher_joint)
+
 
     # Control Variables
     uc = np.zeros((7, t.shape[0]), dtype = np.double)
@@ -103,7 +111,7 @@ def main(publiser_odom):
         # Get time
         tic = rospy.get_time()
 
-        # Get velocities through
+        # Get velocities 
         uc[0, k] = vxd
         uc[1, k] = vyd
         uc[2, k] = vzd
@@ -112,8 +120,10 @@ def main(publiser_odom):
         uc[5, k] = q2pd
         uc[6, k] = q3pd
 
-        # System Dynamics
+        # System 
         h[:, k+1] = aerial_1.system(uc[:, k])
+        aerial_1.send_odometry()
+        aerial_1.send_joint()
         rospy.loginfo("Aerial Manipulator Simulation")
 
         # Time restriction Correct
@@ -132,11 +142,18 @@ if __name__ == '__main__':
         odomety_topic = "/aerial_manipulator/odom"
         odometry_publisher = rospy.Publisher(odomety_topic, Odometry, queue_size = 10)
 
+        # Publisher Info
+        joint_states_topic = "/aerial_manipulator/joints"
+        joint_publisher = rospy.Publisher(joint_states_topic, JointState, queue_size=10)
+
         # Subscribe Info
         velocity_topic = "/aerial_manipulator/cmd_vel"
         velocity_subscriber = rospy.Subscriber(velocity_topic, Twist, velocity_call_back)
 
-        main(odometry_publisher)
+        # Subscribe Info joints
+        joint_ref_topic = "/aerial_manipulator/joints_ref"
+        velocity_subscriber = rospy.Subscriber(joint_ref_topic, Float64MultiArray, joints_call_back)
+        main(odometry_publisher, joint_publisher)
 
     except(rospy.ROSInterruptException, KeyboardInterrupt):
         print("Error System")

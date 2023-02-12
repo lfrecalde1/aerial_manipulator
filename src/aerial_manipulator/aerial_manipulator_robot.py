@@ -4,9 +4,11 @@ import numpy as np
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from scipy.spatial.transform import Rotation
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Header
 
 class AerialManipulatorRobot:
-    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher, parameters: list):
+    def __init__(self, L : list, x: np.ndarray, ts: float, odom_publi: rospy.topics.Publisher, parameters: list, joint_publi: rospy.topics.Publisher):
         super().__init__()
         # States desired point
         self.h = x
@@ -32,6 +34,7 @@ class AerialManipulatorRobot:
 
         # Comunication Odometry
         self.odom_publisher = odom_publi
+        self.joint_publisher = joint_publi
 
     def get_M_matrix(self, x:np.ndarray)-> np.ndarray:
         # Variables system
@@ -337,12 +340,17 @@ class AerialManipulatorRobot:
         B[0:7, 0:7] = M_1
         B[7:10, 0:7] = np.zeros((3,7), dtype=np.double)
 
-        G_aux = np.zeros((10,), dtype=np.double)
+        G_aux = np.zeros((10, ), dtype=np.double)
         G_aux[0:7] = -M_1@G
 
         # System
         xp = A@x + B@u + G_aux
+
         return xp
+
+
+        
+
 
     def system(self, u: np.ndarray)->np.ndarray:
         # Get sample time
@@ -361,3 +369,36 @@ class AerialManipulatorRobot:
         # Update internal States
         self.h = x
         return x.T
+
+    def send_odometry(self)->None:
+        # Get states System 
+        xp = self.h
+
+        # Create type pf message
+        odom_message = Odometry()
+
+        # Velocity of the system
+        odom_message.twist.twist.linear.x = xp[0]
+        odom_message.twist.twist.linear.y = xp[1]
+        odom_message.twist.twist.linear.z = xp[2]
+        odom_message.twist.twist.angular.x = 0.0
+        odom_message.twist.twist.angular.y = 0.0
+        odom_message.twist.twist.angular.z = xp[3]
+
+        self.odom_publisher.publish(odom_message)
+        return None
+
+    def send_joint(self)->None:
+        # Get states System 
+        xp = self.h
+        # Message defintion
+        joint_message = JointState()
+        joint_message.header = Header()
+        joint_message.header.stamp = rospy.Time.now()
+        joint_message.name = ['q0', 'q1', 'q2']
+        joint_message.position = [xp[7], xp[8], xp[9]]
+        joint_message.velocity = [xp[4], xp[5], xp[6]]
+        joint_message.effort = []
+
+        self.joint_publisher.publish(joint_message)
+        return None
