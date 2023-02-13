@@ -1,10 +1,6 @@
-function [h,hp] = odometry(odom, L)
+function [h,hp] = odometry(odom)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-
-% Robot constant parameters
-a = L(1);
-
 
 % Read odometry values from ros
 odomdata = receive(odom,3);

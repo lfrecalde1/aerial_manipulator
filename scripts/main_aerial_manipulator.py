@@ -88,9 +88,10 @@ def main(publiser_odom, publisher_joint):
     q1p = 0.0
     q2p = 0.0
     q3p = 0.0
-    q1 = 0.0
-    q2 = 0.0
-    q3 = 0.0
+    q1 = 45*(np.pi/180)
+    q2 = 45*(np.pi/180)
+    q3 = 0.0*(np.pi/180)
+
 
     # Initial conditions velocities vector
     h = np.zeros((10, t.shape[0] + 1), dtype=np.double)

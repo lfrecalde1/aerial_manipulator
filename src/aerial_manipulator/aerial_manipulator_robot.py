@@ -455,7 +455,7 @@ class AerialManipulatorRobot:
         odom_message.pose.pose.orientation.x = quat[0]
         odom_message.pose.pose.orientation.y = quat[1]
         odom_message.pose.pose.orientation.z = quat[2]
-        odom_message.pose.pose.orientation.z = quat[3]
+        odom_message.pose.pose.orientation.w = quat[3]
 
         # Velocity of the system
         odom_message.twist.twist.linear.x = xp[0]

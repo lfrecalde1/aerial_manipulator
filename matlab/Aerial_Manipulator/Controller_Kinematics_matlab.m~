@@ -1,0 +1,169 @@
+%% ************************************************************************
+%% *********** KINEMATIC CONTROLLER **************
+%% ************************************************************************
+%% TIME PARAMETERS
+clear all;
+close all;
+clc;
+warning off;
+ts = 0.1;
+tfin = 60;
+t = (0.1:ts:tfin);
+%% PARAMETERS ROBOT
+%% LOCATION OF THE MANIPULATOR
+a1 = 0;
+b1 = 0;
+h = 0.12;
+scaleRobot = 1;
+
+%% LINKS
+%% LINKS LENGTH
+l11 = 0.4;
+l12 = 0.26;
+l13 = 0.12;
+L = [h, l11, l12];
+
+%% INITIAL CONDITIONS
+%% UAV
+x(1) = 0;
+y(1) = 0;
+z(1) = 1;
+psi(1)= 0*pi/180;
+
+
+%% Brazo 1
+q11(1)= 0*pi/180;
+q12(1)= 0*pi/180;
+q13(1)= 0*pi/180;
+q14(1)= 0*pi/180;
+
+%% DESIRED TRAJECTORY
+hxd1 = 1.9*cos(0.05*t)+1.75;      hxd1_p = -1.9*0.05*sin(0.05*t);
+hyd1 = 1.9*sin(0.05*t)+1.75;      hyd1_p =  1.9*0.05*cos(0.05*t);
+hzd1 = 0.2*sin(0.1*t)+2;          hzd1_p =  0.2*0.1*cos(0.1*t);
+
+hd = [hxd1; hyd1; hzd1];
+hdp = [hxd1_p; hyd1_p; hzd1_p];
+%% FORWARD KINEMATICS
+Salida = forward_kinematics([x(1); y(1); z(1); psi(1)], [q11(1); q12(1); q13(1)], L);
+hx1 = Salida(1);
+hy1 = Salida(2);
+hz1 = Salida(3);
+
+H(:, 1) = [hx1; hy1; hz1; psi(1)];
+q = [q11(1); q12(1); q13(1)];
+
+%% SIMULATION SYSTEM
+for k=1:length(t)
+    tic
+    %% GENERAL CONTROL ERROR
+    hxe1(k) = hxd1(k) - hx1(k);
+    hye1(k) = hyd1(k) - hy1(k);
+    hze1(k) = hzd1(k) - hz1(k);
+    
+   
+    %% CONTROL LAW
+    Vref = control_system(hd(:, k), hdp(:, k), H(:, k), q(:, k), L);
+    
+    %% CONTROL VELOCITIES
+    ul(k) = Vref(1);
+    um(k) = Vref(2);
+    un(k) = Vref(3);
+    w(k) = Vref(4);
+    q11_p(k) = Vref(5);
+    q12_p(k) = Vref(6);
+    q13_p(k) = Vref(7);
+    
+    %% AERIAL ROBOT
+    xp = ul(k)*cos(psi(k)) - um(k)*sin(psi(k));
+    yp = ul(k)*sin(psi(k)) + um(k)*cos(psi(k));
+    zp = un(k);
+    
+    %% ODOMETRY AERIAL
+    x(k+1) = xp*ts + x(k);
+    y(k+1) = yp*ts + y(k);
+    z(k+1) = zp*ts + z(k);
+    psi(k+1)= w(k)*ts + psi(k);
+    
+    %% MANIPULATOR SYSTEM
+    q11(k+1) = q11(k) + q11_p(k)*ts;
+    q12(k+1) = q12(k) + q12_p(k)*ts;
+    q13(k+1) = q13(k) + q13_p(k)*ts;
+    
+    
+    %% FORWARD SYSTEM
+    Salida = forward_kinematics([x(k+1); y(k+1); z(k+1); psi(k+1)], [q11(k+1); q12(k+1); q13(k+1)], L);
+    hx1(k+1) = Salida(1);
+    hy1(k+1) = Salida(2);
+    hz1(k+1) = Salida(3);
+    
+    H(:, k+1) = [Salida(1); Salida(2); Salida(3); psi(k+1)];
+    q(:, k+1) = [q11(k+1); q12(k+1); q13(k+1)];
+    
+    toc
+end
+%% ANIMATION
+close all; paso =10; fig=figure;
+grid on
+cameratoolbar
+robotParameters;
+A1 = robotPlot(x(1),y(1),z(1),psi(1),scaleRobot);hold on
+A2 = brazoPlot(x(1),y(1),z(1),a1,b1,psi(1),q11(1),q12(1),q13(1),0,scaleRobot);hold on
+G1 = plot3(hxd1(1),hyd1(1),hzd1(1),'r','linewidth',2);hold on
+G2 = plot3(hx1(1),hy1(1),hz1(1),'-k','linewidth',2);hold on
+
+for k = 1:paso:length(t)
+    %% SYSTEM DRAW
+    drawnow
+    delete(A1);
+    delete(A2);
+    delete(G1);
+    delete(G2);
+    
+    %% DRONE PLOT
+    A1 = robotPlot(x(k),y(k),z(k),psi(k),scaleRobot);grid on
+    A2 = brazoPlot(x(k),y(k),z(k),a1,b1,psi(k),q11(k),q12(k),q13(k),0,scaleRobot);grid on
+    G1 = plot3(hxd1(1:k),hyd1(1:k),hzd1(1:k),'r','linewidth',2);grid on
+    G2 = plot3(hx1(1:k),hy1(1:k),hz1(1:k),'--k','linewidth',2);grid on
+    xlabel('X[m]'), ylabel('Y[m]'), zlabel('Z[m]')
+end
+
+%% FIGURES
+figure('Name','Errores de Control')
+plot(hxe1,'r','linewidth',2);
+hold on;
+plot(hye1,'g','linewidth',2);
+plot(hze1,'b','linewidth',2);
+legend('errx','erry','errz');
+grid on;
+title ('Errores de Control Brazo 1');
+xlabel('Tiempo'), ylabel('Error [m]');
+
+figure('Name','Velocidades de Eslabones');
+plot(q11_p,'r','linewidth',2);
+hold on;
+plot(q12_p,'g','linewidth',2);
+plot(q13_p,'b','linewidth',2);
+plot(q14_p,'m','linewidth',2);
+legend('q11p','q12p','q13p','q14p');
+grid on;
+title ('Velocidades de Eslabones Brazo 1');
+xlabel('Tiempo'), ylabel('Velocidad [m/s]');
+
+figure('Name','Velocidades del AUV')
+plot(ul,'r','linewidth',2),legend('ul');
+grid on;
+title ('Velocidad en x');
+xlabel('Tiempo'), ylabel('Velocidad [m/s]')
+plot(um,'b','linewidth',2);
+legend('um');
+grid on;
+title ('Velocidad en y');
+xlabel('Tiempo');
+ylabel('Velocidad [m/s]');
+plot(un,'k','linewidth',2);
+legend('un');
+grid on;
+title ('Velocidad en z');
+xlabel('Tiempo'), ylabel('Velocidad [m/s]')
+

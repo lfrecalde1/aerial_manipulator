@@ -129,8 +129,6 @@ send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0 , 0]);
 send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
 
 
-%% INITIAL VALUES ESTIMATION DYNAMICS
-v_estimate(:, 1) = [v(:,1); qp(:, 1); q(:,1)];
 for k=1:1:length(t)-1
     tic; 
     %% GENERAL VECTOR OF ERROR SYSTEM
@@ -435,3 +433,4 @@ ax_7.YMinorGrid = 'on';
 ax_7.MinorGridAlpha = 0.15;
 ax_7.LineWidth = 0.8;
 ax_7.XLim = [0 t(end)];
+
