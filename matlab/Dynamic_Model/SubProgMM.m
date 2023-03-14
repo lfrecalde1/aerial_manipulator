@@ -1,0 +1,46 @@
+MM2=subs(MM, (R_ap*(m_1 + m_2 + m_3 + m_uav - K_1*K_d1))/(4*K_1*K_ap*K_p1),x_1);
+MM2=subs(MM2,-(K_d2*R_ap)/(4*K_ap*K_p1),-x_2);
+MM2=subs(MM2,(K_d3*R_ap)/(4*K_ap*K_p1),x_3);
+MM2=subs(MM2,R_ap/(4*K_1*K_ap*K_p1),x_4);
+MM2=subs(MM2,-R_ap/(4*K_1*K_ap*K_p1),-x_4);
+MM2=subs(MM2,l_2*m_2,x_5);
+MM2=subs(MM2,l_2*m_3,x_6);
+MM2=subs(MM2,l_3*m_3,x_7);
+MM2=subs(MM2,- K_1*K_d4,-x_8);
+
+MM2=subs(MM2,-(K_d1*R_ap)/(4*K_ap*K_p2),-x_9);
+MM2=subs(MM2,(R_ap*(m_1 + m_2 + m_3 + m_uav + K_1*K_d2))/(4*K_1*K_ap*K_p2),x_10);
+MM2=subs(MM2,(K_d3*R_ap)/(4*K_ap*K_p2),x_11);
+MM2=subs(MM2,R_ap/(4*K_1*K_ap*K_p2),x_12);
+MM2=subs(MM2,-R_ap/(4*K_1*K_ap*K_p2),-x_12);
+
+MM2=subs(MM2,(K_d1*R_ap)/(4*K_ap*K_p3),x_13);
+MM2=subs(MM2,(K_d2*R_ap)/(4*K_ap*K_p3),x_14);
+MM2=subs(MM2,(R_ap*(m_1 + m_2 + m_3 + m_uav + K_1*K_d3))/(4*K_1*K_ap*K_p3),x_15);
+MM2=subs(MM2,(K_d4*R_ap)/(4*K_ap*K_p3),x_16);
+MM2=subs(MM2,-R_ap/(4*K_1*K_ap*K_p3),-x_17);
+MM2=subs(MM2,R_ap/(4*K_ap*K_p4*b_1),x_18);
+MM2=subs(MM2,K_d1*b_1 ,x_19);
+MM2=subs(MM2,-R_ap/(4*K_ap*K_p4*b_1),-x_18);
+MM2=subs(MM2,K_d2*b_1  ,x_20);
+MM2=subs(MM2,(K_d3*R_ap)/(4*K_ap*K_p4) ,x_21);
+MM2=subs(MM2,R_ap/(8*K_ap*K_p4*b_1),x_18/2);
+MM2=subs(MM2,2*J_uav - 2*K_d4*b_1,x_22);
+MM2=subs(MM2,l_2*x_5 + l_2*x_6 + l_3*x_7,x_23);
+MM2=subs(MM2,R_a/(K_a*K_p),x_24);
+MM2=subs(MM2,-R_a/(K_a*K_p),-x_24);
+MM2=subs(MM2,K_d ,x_25);
+MM2=simplify(MM2);
+
+MM3=subs(MM2,cos(q_1),'C_1');
+MM3=subs(MM3,sin(q_1),'S_1');
+MM3=subs(MM3,cos(q_2),'C_2');
+MM3=subs(MM3,sin(q_2),'S_2');
+MM3=subs(MM3,cos(q_3),'C_3');
+MM3=subs(MM3,sin(q_3),'S_3');
+MM3=subs(MM3,cos(2*q_2),'C_22');
+MM3=subs(MM3,cos(2*q_2 + q_3),'C_223');
+MM3=subs(MM3,cos(2*q_2 + 2*q_3),'C_2223');
+MM3=subs(MM3,cos(q_2 + q_3),'C_23');
+MM3=subs(MM3,sin(q_2 + q_3),'S_23');
+MM3=simplify(MM3);
