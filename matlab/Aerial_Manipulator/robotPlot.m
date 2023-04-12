@@ -8,7 +8,7 @@ l1 = 0.4;
 l2 = 0.26;
 a = 0.13;
 b = 0.39;
-% Matriz de rotación
+% Matriz de rotaciï¿½n
 Rz=[cos(psi) -sin(psi) 0; sin(psi) cos(psi) 0; 0 0 1];
 
 scaleRobot=scaleRobot*(scaleRobot/1000);

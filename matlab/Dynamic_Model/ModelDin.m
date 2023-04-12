@@ -85,7 +85,8 @@ for i=1:length(E)
         G(i)=c(length(t));
     end
 end
-
+(M(1,7)-M(7,1))
+size(M)
 M_p=difft(M,[E]);
 Y1=simplify((C+C')-M_p);
 Y2=simplify(T'-M*Epp'-C*Ep'-G');

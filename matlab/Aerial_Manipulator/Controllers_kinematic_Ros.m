@@ -9,7 +9,7 @@ clc;
 %% TIME DEFINITION
 ts = 0.1;
 tfin = 20;
-t = (0.1:ts:tfin);
+t = (0.0:ts:tfin);
 
 
 %% LOCATION OF THE MANIPULATOR
@@ -27,8 +27,8 @@ L = [h, l11, l12];
 %% ROS PARAMETER FOR COMUNICATION
 rosshutdown
 active = true;
-Master = 'http://192.168.0.104:11311';
-Local = '192.168.0.104';
+Master = 'http://190.124.230.212:11311';
+Local = '190.124.230.212';
 ROS_Options(Master,Local,active);
 
 %% OBJECTS CREATION OF TOPICS ROS

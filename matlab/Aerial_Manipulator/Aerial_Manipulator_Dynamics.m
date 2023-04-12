@@ -106,8 +106,8 @@ L1 = [0];
 %% ROS PARAMETER FOR COMUNICATION
 rosshutdown
 active = true;
-Master = 'http://192.168.0.104:11311';
-Local = '192.168.0.104';
+Master = 'http://190.124.230.212:11311';
+Local = '190.124.230.212';
 ROS_Options(Master,Local,active);
 
 %% OBJECTS CREATION OF TOPICS ROS
@@ -121,8 +121,8 @@ odom = rossubscriber('/aerial_manipulator/odom');
 joints = rossubscriber('/aerial_manipulator/joints');
 
 %% READ INITIAL VALUES
-[h_drone(:, 1), hp_drone(:, 1)] = odometry(odom, L1);
-[q_drone(:,1), qp_drone(:,1)] = joints_states(joints, L1);
+[h_drone(:, 1), hp_drone(:, 1)] = odometry(odom);
+[q_drone(:,1), qp_drone(:,1)] = joints_states(joints);
 
 %% SET VALUES TO ZERO
 send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0 , 0]);
@@ -139,8 +139,8 @@ for k=1:1:length(t)-1
     send_joints_velocities(robot_joints, joint_msg, [qp_ref(1, k), qp_ref(2, k), qp_ref(3, k)]);
 
     %% GET VALUES OF MOBILE
-    [h_drone(:, k+1), hp_drone(:, k+1)] = odometry(odom, L1);
-    [q_drone(:, k+1), qp_drone(:, k+1)] = joints_states(joints, L1);
+    [h_drone(:, k+1), hp_drone(:, k+1)] = odometry(odom);
+    [q_drone(:, k+1), qp_drone(:, k+1)] = joints_states(joints);
     while(toc<ts)
     end
     toc;

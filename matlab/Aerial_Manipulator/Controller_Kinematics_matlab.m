@@ -20,7 +20,6 @@ scaleRobot = 1;
 %% LINKS LENGTH
 l11 = 0.4;
 l12 = 0.26;
-l13 = 0.12;
 L = [h, l11, l12];
 
 %% INITIAL CONDITIONS
@@ -34,7 +33,7 @@ psi(1)= 0*pi/180;
 q11(1)= 0*pi/180;
 q12(1)= 0*pi/180;
 q13(1)= 0*pi/180;
-q14(1)= 0*pi/180;
+
 
 %% DESIRED TRAJECTORY
 hxd1 = 1.9*cos(0.05*t)+1.75;      hxd1_p = -1.9*0.05*sin(0.05*t);
@@ -102,7 +101,7 @@ for k=1:length(t)
     toc
 end
 %% ANIMATION
-close all; paso =10; fig=figure;
+close all; paso =20; fig=figure;
 grid on
 cameratoolbar
 robotParameters;
@@ -143,8 +142,7 @@ plot(q11_p,'r','linewidth',2);
 hold on;
 plot(q12_p,'g','linewidth',2);
 plot(q13_p,'b','linewidth',2);
-plot(q14_p,'m','linewidth',2);
-legend('q11p','q12p','q13p','q14p');
+legend('q11p','q12p','q13p');
 grid on;
 title ('Velocidades de Eslabones Brazo 1');
 xlabel('Tiempo'), ylabel('Velocidad [m/s]');
