@@ -158,7 +158,7 @@ fontsizeLegend = 11;
 fontsizeTicks = 11;
 fontsizeTitel = 11;
 sizeX = 1300; 
-sizeY = 750; 
+sizeY = 650; 
 
 %% COLOR PROPERTIES
 c1 = [80, 81, 79]/255;
@@ -483,7 +483,7 @@ hTitle_1 = title({'$\textrm{(a)}$'},'fontsize',12,'interpreter','latex','Color',
 ylabel('$[m/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_1 = legend([ul,ul_m,ul_ref],{'$\mu_{l}$','$\mu_{lm}$','$\mu_{lref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_1 = legend([ul,ul_m,ul_ref],{'$\mu_{l}$','$\mu_{lm}$','$\mu_{ld}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
          'fontsize',1.1*fontsizeTicks)
      
@@ -518,7 +518,7 @@ set(um_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 ylabel('$[m/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_2 = legend([um, um_m, um_ref],{'$\mu_{m}$','$\mu_{mm}$','$\mu_{mref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_2 = legend([um, um_m, um_ref],{'$\mu_{m}$','$\mu_{mm}$','$\mu_{md}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks)
 %% Figure properties
@@ -553,7 +553,7 @@ set(un_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 ylabel('$[m/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_3 = legend([un, un_m, un_ref],{'$\mu_{n}$','$\mu_{nm}$','$\mu_{nref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_3 = legend([un, un_m, un_ref],{'$\mu_{n}$','$\mu_{nm}$','$\mu_{nd}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks)
 %% Figure properties
@@ -583,11 +583,11 @@ set(w_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 
 
 %% Title of the image
-%xlabel('$\textrm{Time}[s]$','fontsize',10,'interpreter','latex','Color',C18);
+xlabel('$\textrm{Time}[s]$','fontsize',10,'interpreter','latex','Color',C18);
 ylabel('$[rad/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_4 = legend([w, w_m, w_ref],{'$\omega$','$\omega_m$','$\omega_{ref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_4 = legend([w, w_m, w_ref],{'$\omega$','$\omega_m$','$\omega_{d}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks)
 %% Figure properties
@@ -596,7 +596,7 @@ ax_4.Box = 'on';
 ax_4.BoxStyle = 'full';
 ax_4.TickLength = [0.01;0.01];
 ax_4.TickDirMode = 'auto';
-ax_4.XTickLabel = [];
+%ax_4.XTickLabel = [];
 ax_4.YMinorTick = 'on';
 ax_4.XMinorTick = 'on';
 ax_4.XMinorGrid = 'on';
@@ -617,11 +617,12 @@ set(q1p_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 
 
 %% Title of the image
+hTitle_1 = title({'$\textrm{(b)}$'},'fontsize',12,'interpreter','latex','Color',C18);
 %xlabel('$\textrm{Time}[s]$','fontsize',10,'interpreter','latex','Color',C18);
 ylabel('$[rad/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_5 = legend([q1p, q1p_m, q1p_ref],{'$\dot{q}_1$', '$\dot{q}_{1m}$','$\dot{q}_{1ref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_5 = legend([q1p, q1p_m, q1p_ref],{'$\dot{q}_1$', '$\dot{q}_{1m}$','$\dot{q}_{1d}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks)
 %% Figure properties
@@ -655,7 +656,7 @@ set(q2p_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 ylabel('$[rad/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_6 = legend([q2p, q2p_m, q2p_ref],{'$\dot{q}_2$', '$\dot{q}_{2m}$','$\dot{q}_{2ref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_6 = legend([q2p, q2p_m, q2p_ref],{'$\dot{q}_2$', '$\dot{q}_{2m}$','$\dot{q}_{2d}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks);
 %% Figure properties
@@ -685,11 +686,11 @@ set(q3p_ref, 'LineStyle', '-.', 'Color', C9, 'LineWidth', 1.3*lw);
 
 
 %% Title of the image
-%xlabel('$\textrm{Time}[s]$','fontsize',10,'interpreter','latex','Color',C18);
+xlabel('$\textrm{Time}[s]$','fontsize',10,'interpreter','latex','Color',C18);
 ylabel('$[rad/s]$','fontsize',9,'interpreter','latex', 'Color',C18);
 
 %% Legend nomeclature
-hLegend_7 = legend([q3p, q3p_m, q3p_ref],{'$\dot{q}_3$', '$\dot{q}_{3m}$', '$\dot{q}_{3ref}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
+hLegend_7 = legend([q3p, q3p_m, q3p_ref],{'$\dot{q}_3$', '$\dot{q}_{3m}$', '$\dot{q}_{3d}$'},'fontsize',11,'interpreter','latex','Color',[255 255 255]/255,'NumColumns',1,'TextColor','black');
 set(gca,'ticklabelinterpreter','latex',...
     'fontsize',1.1*fontsizeTicks)
 %% Figure properties
@@ -698,7 +699,7 @@ ax_7.Box = 'on';
 ax_7.BoxStyle = 'full';
 ax_7.TickLength = [0.01;0.01];
 ax_7.TickDirMode = 'auto';
-ax_7.XTickLabel = [];
+%ax_7.XTickLabel = [];
 ax_7.YMinorTick = 'on';
 ax_7.XMinorTick = 'on';
 ax_7.XMinorGrid = 'on';
@@ -706,6 +707,10 @@ ax_7.YMinorGrid = 'on';
 ax_7.MinorGridAlpha = 0.15;
 ax_7.LineWidth = 0.8;
 ax_7.XLim = [0 t(end)];
+
+set(gcf, 'Color', 'w'); % Sets axes background
+export_fig Identification.pdf -q101
+
 print -dpng doc\Identification_system
 
 %% SAVE PARAMETERS

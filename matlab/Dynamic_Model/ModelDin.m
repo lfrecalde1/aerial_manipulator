@@ -79,7 +79,7 @@ end
 
 for i=1:length(E)
     [c,t] = coeffs(T(i),[Ep Epp]);
-    if t(length(t))~=1;
+    if t(length(t))~=1
         G(i)=sym(0);
     else
         G(i)=c(length(t));
