@@ -1,5 +1,6 @@
 <launch>
     <node pkg = "aerial_manipulator" name = "Node_Dynamics" type = "main_aerial_manipulator.py" output = "screen">
     </node>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 
 </launch>

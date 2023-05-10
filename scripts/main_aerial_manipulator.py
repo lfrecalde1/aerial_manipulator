@@ -4,6 +4,7 @@ from std_msgs.msg import String
 import numpy as np
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
+from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64MultiArray
 from aerial_manipulator.aerial_manipulator_robot import AerialManipulatorRobot
@@ -22,6 +23,10 @@ q1pd = 0.0
 q2pd = 0.0
 q3pd = 0.0
 
+xd = 0.0
+yd = 0.0
+zd = 0.0
+
 def velocity_call_back(velocity_message):
     global vxd, vyd, vzd, wxd, wyd, wzd
     # Read the linear Velocities
@@ -33,6 +38,14 @@ def velocity_call_back(velocity_message):
     wxd = velocity_message.angular.x
     wyd = velocity_message.angular.y
     wzd = velocity_message.angular.z
+    return None
+
+def trajectory_call_back(trajectory_message):
+    # Read the linear Velocities
+    global xd, yd, zd
+    xd = trajectory_message.pose.position.x
+    yd = trajectory_message.pose.position.y
+    zd = trajectory_message.pose.position.z
     return None
 
 def joints_call_back(joints_message):
@@ -164,6 +177,9 @@ if __name__ == '__main__':
         # Subscribe Info
         velocity_topic = "/aerial_manipulator/cmd_vel"
         velocity_subscriber = rospy.Subscriber(velocity_topic, Twist, velocity_call_back)
+
+        trajectory_topic = "/aerial_manipulator/ref"
+        trajectory_subscriber = rospy.Subscriber(trajectory_topic, PoseStamped, trajectory_call_back)
 
         # Subscribe Info joints
         joint_ref_topic = "/aerial_manipulator/joints_ref"

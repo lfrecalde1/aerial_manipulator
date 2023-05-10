@@ -1,9 +1,9 @@
 function [vref] = dynamic_identification(x, vp, v, qpp, qp, q)
 
 %% CONSTANT VALUES
-l_2= 0.092;
+l_2= 0.092; 
 l_3= 0.196;
-g=9.81;
+g = 9.81;
 %% GET VALUES
 q_1 = q(1);
 q_2 = q(2);

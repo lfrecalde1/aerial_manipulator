@@ -8,19 +8,19 @@ clc;
 
 %% TIME DEFINITION
 ts = 0.1;
-tfin = 10;
+tfin = 40;
 t = (0.0:ts:tfin);
 
 
 %% LOCATION OF THE MANIPULATOR
 a1 = 0;
 b1 = 0;
-h = 0.12;
+h = 0.19;
 scaleRobot = 1;
 
 %% LINKS LENGTH
-l11 = 0.4;
-l12 = 0.26;
+l11 = 0.075;
+l12 = 0.185;
 l13 = 0.12;
 L = [h, l11, l12];
 
@@ -40,6 +40,10 @@ joint_msg = rosmessage(robot_joints);
 
 odom = rossubscriber('/aerial_manipulator/odom');
 joints = rossubscriber('/aerial_manipulator/joints');
+
+reference = rospublisher('/aerial_manipulator/ref');
+reference_msg = rosmessage(reference);
+
 
 %% READ INITIAL VALUES
 [h_drone(:, 1), hp_drone(:, 1)] = odometry(odom);
@@ -68,17 +72,19 @@ for k=1:length(t)
     hye1(k) = hyd1(k) - H(2, k);
     hze1(k) = hzd1(k) - H(3, k);
     
+    %% Send Reference Signal
+    send_trajectory(reference, reference_msg, hd(:,k));
    
     %% CONTROL LAW
     Vref(:, k) = control_system(hd(:, k), hdp(:, k), H(:, k), q_drone(:, k), L);
     
     
 %      %% SEND VALUES OF CONTROL ROBOT
-         send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0, 2]);
-    send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
-%      
-%     send_velocities(robot_cmd, cmd_msg, [Vref(1, k), Vref(2, k), Vref(3, k), 0, 0, Vref(4, k)]);
-%     send_joints_velocities(robot_joints, joint_msg, [Vref(5, k), Vref(6, k), Vref(6, k)]);
+%     send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0, 2]);
+%     send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
+% %      
+    send_velocities(robot_cmd, cmd_msg, [Vref(1, k), Vref(2, k), Vref(3, k), 0, 0, Vref(4, k)]);
+    send_joints_velocities(robot_joints, joint_msg, [Vref(5, k), Vref(6, k), Vref(6, k)]);
 
     %% GET VALUES OF MOBILE
     [h_drone(:, k+1), hp_drone(:, k+1)] = odometry(odom);
@@ -96,31 +102,31 @@ end
 send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0 , 0]);
 send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
 
-%% ANIMATION
-close all; paso =10; fig=figure;
-grid on
-cameratoolbar
-robotParameters;
-A1 = robotPlot(h_drone(1,1),h_drone(2,1),h_drone(3,1),h_drone(4,1),scaleRobot);hold on
-A2 = brazoPlot(h_drone(1,1),h_drone(2,1),h_drone(3,1),a1,b1,h_drone(4,1),q_drone(1,1),q_drone(2,1),q_drone(3,1),0,scaleRobot);hold on
-G1 = plot3(hxd1(1),hyd1(1),hzd1(1),'r','linewidth',2);hold on
-G2 = plot3(H(1,1),H(2,1),H(3,1),'-k','linewidth',2);hold on
-
-for k = 1:paso:length(t)
-    %% SYSTEM DRAW
-    drawnow
-    delete(A1);
-    delete(A2);
-    delete(G1);
-    delete(G2);
-    
-    %% DRONE PLOT
-    A1 = robotPlot(h_drone(1,k),h_drone(2,k),h_drone(3,k),h_drone(4,k),scaleRobot);hold on
-    A2 = brazoPlot(h_drone(1,k),h_drone(2,k),h_drone(3,k),a1,b1,h_drone(4,k),q_drone(1,k),q_drone(2,k),q_drone(3,k),0,scaleRobot);hold on
-    G1 = plot3(hxd1(1:k),hyd1(1:k),hzd1(1:k),'r','linewidth',2);hold on
-    G2 = plot3(H(1,1:k),H(2,1:k),H(3,1:k),'--k','linewidth',2);hold on
-    xlabel('X[m]'), ylabel('Y[m]'), zlabel('Z[m]')
-end
+% %% ANIMATION
+% close all; paso =10; fig=figure;
+% grid on
+% cameratoolbar
+% robotParameters;
+% A1 = robotPlot(h_drone(1,1),h_drone(2,1),h_drone(3,1),h_drone(4,1),scaleRobot);hold on
+% A2 = brazoPlot(h_drone(1,1),h_drone(2,1),h_drone(3,1),a1,b1,h_drone(4,1),q_drone(1,1),q_drone(2,1),q_drone(3,1),0,scaleRobot);hold on
+% G1 = plot3(hxd1(1),hyd1(1),hzd1(1),'r','linewidth',2);hold on
+% G2 = plot3(H(1,1),H(2,1),H(3,1),'-k','linewidth',2);hold on
+% 
+% for k = 1:paso:length(t)
+%     %% SYSTEM DRAW
+%     drawnow
+%     delete(A1);
+%     delete(A2);
+%     delete(G1);
+%     delete(G2);
+%     
+%     %% DRONE PLOT
+%     A1 = robotPlot(h_drone(1,k),h_drone(2,k),h_drone(3,k),h_drone(4,k),scaleRobot);hold on
+%     A2 = brazoPlot(h_drone(1,k),h_drone(2,k),h_drone(3,k),a1,b1,h_drone(4,k),q_drone(1,k),q_drone(2,k),q_drone(3,k),0,scaleRobot);hold on
+%     G1 = plot3(hxd1(1:k),hyd1(1:k),hzd1(1:k),'r','linewidth',2);hold on
+%     G2 = plot3(H(1,1:k),H(2,1:k),H(3,1:k),'--k','linewidth',2);hold on
+%     xlabel('X[m]'), ylabel('Y[m]'), zlabel('Z[m]')
+% end
 
 %% FIGURES
 figure('Name','Errores de Control')

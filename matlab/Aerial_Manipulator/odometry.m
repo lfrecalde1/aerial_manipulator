@@ -14,7 +14,7 @@ x = pose.Position.X;
 y = pose.Position.Y;
 z = pose.Position.Z;
 
-yaw = angles(1)
+yaw = angles(1);
 
 
 % Get values of linear an angular velocities
