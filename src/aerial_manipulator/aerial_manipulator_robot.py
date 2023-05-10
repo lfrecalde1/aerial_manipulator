@@ -407,6 +407,7 @@ class AerialManipulatorRobot:
         k3 = self.f_model(v + (Ts/2)*k2, u)
         k4 = self.f_model(v + Ts*k3, u)
         v = v + (Ts/6)*(k1 + 2*k2 + 2*k3 + k4)
+        v = v + np.random.uniform(low=-0.01, high=0.01, size=(10,))
 
         # Update internal States
         self.h = v
@@ -422,16 +423,18 @@ class AerialManipulatorRobot:
 
         # Velocities system
         v = self.h
+        #print(v[0:4])
 
         # System Internal states
-        x_k = self.x[0:4]
-        # Runge Kuta 4
+        x_k = np.array([self.x[0:3][0], self.x[0:3][1], self.x[0:3][2], self.x[5]])
 
+        # Runge Kuta 4
         k1 = self.f_model_drone(x_k, v[0:4])
         k2 = self.f_model_drone(x_k + (Ts/2)*k1, v[0:4])
         k3 = self.f_model_drone(x_k + (Ts/2)*k2, v[0:4])
         k4 = self.f_model_drone(x_k + Ts*k3, v[0:4])
         x_k = x_k + (Ts/6)*(k1 + 2*k2 + 2*k3 + k4)
+        #x_k = x_k + np.random.uniform(low=-0.01, high=0.01, size=(4,))
 
 
         self.x = np.array([x_k[0], x_k[1], x_k[2], 0.0, 0.0, x_k[3]], dtype=np.double)

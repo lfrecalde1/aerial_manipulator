@@ -8,3 +8,10 @@ pip install empy
 pip install PyQt5
 pip install PySide2
 pip install mat4py
+pip install pyOpenSSL
+pip install autobahn
+pip install twisted
+pip install tornado
+pip install bson
+pip install pymongo
+pip install Pillow

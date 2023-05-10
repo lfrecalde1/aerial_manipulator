@@ -106,8 +106,8 @@ L1 = [0];
 %% ROS PARAMETER FOR COMUNICATION
 rosshutdown
 active = true;
-Master = 'http://190.124.230.212:11311';
-Local = '190.124.230.212';
+Master = 'http://192.168.88.244:11311';
+Local = '192.168.88.244';
 ROS_Options(Master,Local,active);
 
 %% OBJECTS CREATION OF TOPICS ROS

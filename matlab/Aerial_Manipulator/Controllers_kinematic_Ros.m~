@@ -8,7 +8,7 @@ clc;
 
 %% TIME DEFINITION
 ts = 0.1;
-tfin = 10;
+tfin = 20;
 t = (0.0:ts:tfin);
 
 
@@ -73,12 +73,9 @@ for k=1:length(t)
     Vref(:, k) = control_system(hd(:, k), hdp(:, k), H(:, k), q_drone(:, k), L);
     
     
-%      %% SEND VALUES OF CONTROL ROBOT
-         send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0, 2]);
-    send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
-%      
-%     send_velocities(robot_cmd, cmd_msg, [Vref(1, k), Vref(2, k), Vref(3, k), 0, 0, Vref(4, k)]);
-%     send_joints_velocities(robot_joints, joint_msg, [Vref(5, k), Vref(6, k), Vref(6, k)]);
+     %% SEND VALUES OF CONTROL ROBOT
+    send_velocities(robot_cmd, cmd_msg, [0, Vref(2, k), Vref(3, k), 0, 0, Vref(4, k)]);
+    send_joints_velocities(robot_joints, joint_msg, [Vref(5, k), Vref(6, k), Vref(6, k)]);
 
     %% GET VALUES OF MOBILE
     [h_drone(:, k+1), hp_drone(:, k+1)] = odometry(odom);
