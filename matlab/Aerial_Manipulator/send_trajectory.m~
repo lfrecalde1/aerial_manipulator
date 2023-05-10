@@ -1,4 +1,4 @@
-function  send_trajectory(robot, velmsg, vd, flag)
+function  send_trajectory(robot, velmsg, vd)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -12,7 +12,7 @@ velmsg.Pose.Position.X = vx;
 velmsg.Pose.Position.Y = vy;
 velmsg.Pose.Position.Z = vz;
 
-velmsg.Pose.Orientation.X = flag;
+velmsg.Pose.Orientation.X = 1;
 
 send(robot,velmsg);
 end

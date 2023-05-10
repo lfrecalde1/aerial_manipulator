@@ -73,7 +73,7 @@ for k=1:length(t)
     hze1(k) = hzd1(k) - H(3, k);
     
     %% Send Reference Signal
-    send_trajectory(reference, reference_msg, hd(:,k));
+    send_trajectory(reference, reference_msg, hd(:,k), 1);
    
     %% CONTROL LAW
     Vref(:, k) = control_system(hd(:, k), hdp(:, k), H(:, k), q_drone(:, k), L);
@@ -101,7 +101,7 @@ end
 %% SET VALUES TO ZERO
 send_velocities(robot_cmd, cmd_msg, [0, 0, 0, 0, 0 , 0]);
 send_joints_velocities(robot_joints, joint_msg, [0, 0, 0]);
-
+send_trajectory(reference, reference_msg, hd(:,k), 0);
 % %% ANIMATION
 % close all; paso =10; fig=figure;
 % grid on

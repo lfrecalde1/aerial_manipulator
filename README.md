@@ -1,5 +1,7 @@
 # Aerial Manipulator
-
+<p float="left">
+    <img src="Aerial_simulator.gif" width="770"  />
+ </p>
 Code for the simulation of the aerial manipulator 
 - [Installation](#installation)
 - [Launch](#launch)
@@ -17,8 +19,12 @@ activate it:
 conda create -n py3-aerial_simulation python=3.7
 conda activate py3-aerial_simulation
 ```
+Inside a ROS workspace download the repository in the src folder:
+```bash
+git clone https://github.com/lfrecalde1/aerial_manipulator.git
+```
 
-Then install:
+Then inside aerial_manipulator dolfer install the following dependencies:
 
 ```bash
 chmod +x install_python.sh
