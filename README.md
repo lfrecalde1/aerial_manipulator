@@ -40,3 +40,17 @@ This section shows how to execute the simulatation
 ```bash
 roslaunch aerial_manipulator system_dynamics.launch
 ```
+## Unity3D Visualizer
+The visualizer of the system can be directly downloaded from the following link:
+```bash
+https://drive.google.com/drive/folders/17Wo6B0ZemvFP613rw5oYRuCEEXydANkR?usp=sharing
+```
+Then execute the following comands inside the directory of the visualizer:
+```bash
+chmod +x Manipulador_aereo_V2.x86_64 
+./Manipulador_aereo_V2.x86_64 :w
+```
+The visualizer of the open-acces simulator shows a HMI where the user needs to introduce the IP adress of the ROS master service
+
+
+
