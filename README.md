@@ -50,7 +50,7 @@ Then execute the following comands inside the directory of the visualizer:
 chmod +x Manipulador_aereo_V2.x86_64 
 ./Manipulador_aereo_V2.x86_64 :w
 ```
-The visualizer of the open-acces simulator shows a HMI where the user needs to introduce the IP adress of the ROS master service
+The visualizer of the open-access simulator shows an HMI where the user needs to introduce the IP address of the ROS master service.
 
 
 
