@@ -41,7 +41,7 @@ This section shows how to execute the simulatation
 roslaunch aerial_manipulator system_dynamics.launch
 ```
 ## Unity3D Visualizer
-The visualizer of the system can be directly downloaded from the following link:
+The visualizer of the system can be directly downloaded from the following [link](https://drive.google.com/drive/folders/17Wo6B0ZemvFP613rw5oYRuCEEXydANkR?usp=sharing):
 ```bash
 https://drive.google.com/drive/folders/17Wo6B0ZemvFP613rw5oYRuCEEXydANkR?usp=sharing
 ```
