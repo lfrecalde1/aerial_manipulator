@@ -16,3 +16,4 @@ pip install bson
 pip install pymongo
 pip install Pillow
 sudo apt-get install ros-noetic-rosbridge-server
+pip install gdown
