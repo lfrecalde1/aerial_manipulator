@@ -24,7 +24,6 @@ Create Ros workspace
 ```bash
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/
-catkin_make -DPYTHON_EXECUTABLE=~/miniconda3/envs/py3-aerial_simulation/bin/python
 ```
 
 Inside a ROS workspace download the repository in the src folder:
